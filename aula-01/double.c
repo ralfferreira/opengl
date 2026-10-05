@@ -37,8 +37,8 @@
 
 /*
  *  double.c
- *  This is a simple double buffered program.
- *  Pressing the left mouse button rotates the rectangle.
+ *  Single-buffered spinning rectangle.
+ *  Pressing the left or right mouse button rotates it counterclockwise.
  *  Pressing the middle mouse button stops the rotation.
  */
 #include <GL/glut.h>
@@ -88,14 +88,6 @@ void spinDisplay(void)
    glutPostRedisplay();
 }
 
-void spinDisplayCCW(void)
-{
-   spin = spin - 2.0;
-   if (spin < 0.0)
-      spin = spin + 360.0;
-   glutPostRedisplay();
-}
-
 void init(void) 
 {
    glClearColor (0.0, 0.0, 0.0, 0.0);
@@ -125,7 +117,7 @@ void mouse(int button, int state, int x, int y)
          break;
       case GLUT_RIGHT_BUTTON:
          if (state == GLUT_DOWN)
-            glutIdleFunc(spinDisplayCCW);
+            glutIdleFunc(spinDisplay);
          break;
       default:
          break;
@@ -133,7 +125,7 @@ void mouse(int button, int state, int x, int y)
 }
    
 /* 
- *  Request double buffer display mode.
+ *  Request single buffer display mode.
  *  Register mouse input callback functions
  */
 int main(int argc, char** argv)
