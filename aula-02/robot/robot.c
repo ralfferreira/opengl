@@ -5,7 +5,8 @@
  *   Q/A - Base (rotação Y)
  *   W/S - Ombro (shoulder)
  *   E/D - Cotovelo (elbow)
- *   R/F - Pulso (wrist)
+ *   R/F - Pulso, giro em torno do braço
+ *   Y/H - Pulso, dobra
  *   T/G - Garra (abrir/fechar)
  *   ESC - sair
  */
@@ -16,8 +17,9 @@
 static int baseRotation = 0;
 static int shoulderAngle = -45;
 static int elbowAngle = 45;
-static int wristAngle = 0;
-static int fingerAngle = 0;
+static int wristRoll = 0;
+static int wristPitch = 0;
+static int fingerAngle = 20;
 
 void init(void) 
 {
@@ -46,8 +48,8 @@ void display(void)
    glRotatef((GLfloat)baseRotation, 0.0, 1.0, 0.0);
    drawPart(2.0, 0.4, 2.0, 0.5, 0.5, 0.5);
    
-   /* SHOULDER (ombro) */
-   glTranslatef(0.0, 0.6, 0.0);
+   /* SHOULDER (ombro). 0.2 é o topo da base (altura 0.4). */
+   glTranslatef(0.0, 0.2, 0.0);
    glRotatef((GLfloat)shoulderAngle, 0.0, 0.0, 1.0);
    glTranslatef(0.0, 1.0, 0.0);
    drawPart(0.5, 2.0, 0.5, 0.0, 0.5, 0.8);
@@ -58,25 +60,25 @@ void display(void)
    glTranslatef(0.0, 0.75, 0.0);
    drawPart(0.4, 1.5, 0.4, 0.8, 0.5, 0.0);
    
-   /* WRIST (pulso) */
+   /* WRIST (pulso): dobra no plano do braço, depois giro em torno dele */
    glTranslatef(0.0, 0.75, 0.0);
-   glRotatef((GLfloat)wristAngle, 0.0, 1.0, 0.0);
-   glTranslatef(0.0, 0.25, 0.0);
+   glRotatef((GLfloat)wristPitch, 0.0, 0.0, 1.0);
+   glRotatef((GLfloat)wristRoll, 0.0, 1.0, 0.0);
+   glTranslatef(0.0, 0.15, 0.0);
    drawPart(0.6, 0.3, 0.6, 0.6, 0.0, 0.6);
    
-   /* END EFFECTOR - Dedo 1 */
-   glTranslatef(0.0, 0.2, 0.0);
+   /* Dedos no plano do desenho. Push/pop para cada um sair do mesmo pulso. */
+   glTranslatef(0.0, 0.15, 0.0);
    glPushMatrix();
-      glTranslatef(0.0, 0.0, 0.2);
-      glRotatef((GLfloat)fingerAngle, 1.0, 0.0, 0.0);
+      glTranslatef(0.2, 0.0, 0.0);
+      glRotatef((GLfloat)fingerAngle, 0.0, 0.0, 1.0);
       glTranslatef(0.0, 0.4, 0.0);
       drawPart(0.15, 0.8, 0.15, 0.0, 0.8, 0.0);
    glPopMatrix();
    
-   /* END EFFECTOR - Dedo 2 */
    glPushMatrix();
-      glTranslatef(0.0, 0.0, -0.2);
-      glRotatef((GLfloat)-fingerAngle, 1.0, 0.0, 0.0);
+      glTranslatef(-0.2, 0.0, 0.0);
+      glRotatef((GLfloat)-fingerAngle, 0.0, 0.0, 1.0);
       glTranslatef(0.0, 0.4, 0.0);
       drawPart(0.15, 0.8, 0.15, 0.0, 0.8, 0.0);
    glPopMatrix();
@@ -105,8 +107,10 @@ void keyboard(unsigned char key, int x, int y)
       case 's': shoulderAngle = (shoulderAngle - 5) % 360; break;
       case 'e': elbowAngle = (elbowAngle + 5) % 360; break;
       case 'd': elbowAngle = (elbowAngle - 5) % 360; break;
-      case 'r': wristAngle = (wristAngle + 5) % 360; break;
-      case 'f': wristAngle = (wristAngle - 5) % 360; break;
+      case 'r': wristRoll = (wristRoll + 5) % 360; break;
+      case 'f': wristRoll = (wristRoll - 5) % 360; break;
+      case 'y': wristPitch = (wristPitch + 5) % 360; break;
+      case 'h': wristPitch = (wristPitch - 5) % 360; break;
       case 't': if (fingerAngle < 45) fingerAngle += 5; break;
       case 'g': if (fingerAngle > -30) fingerAngle -= 5; break;
       case 27: exit(0); break;
@@ -127,7 +131,8 @@ int main(int argc, char** argv)
    glutKeyboardFunc(keyboard);
    printf("Controles:\n");
    printf("  Q/A - Base\n  W/S - Ombro\n  E/D - Cotovelo\n");
-   printf("  R/F - Pulso\n  T/G - Garra\n  ESC - Sair\n");
+   printf("  R/F - Pulso (giro)\n  Y/H - Pulso (dobra)\n");
+   printf("  T/G - Garra\n  ESC - Sair\n");
    glutMainLoop();
    return 0;
 }
